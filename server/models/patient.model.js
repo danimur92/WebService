@@ -11,7 +11,7 @@ var PatientSchema = new Schema({
       type: String,
       required: true
     },
-});
+}, {collection: 'patient'});
 
 // Export the model
 module.exports = mongoose.model('Patient', PatientSchema);

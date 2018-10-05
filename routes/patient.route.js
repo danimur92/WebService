@@ -1,15 +1,19 @@
 var express = require('express');
 var router = express.Router();
-const Patient = require('../server/models/patient.model');
 
-/* GET users listing. */
+var MongoClient = require('../server/db/mongoose');
+var Patient = require('../server/models/patient.model');
+
+/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  res.render('index_pat');
 });
 
-//1. a simple test url to check that all of our files are communicating correctly.
-router.get('/test', function (req, res, next) {
-    res.send('Greetings from the Test controller!');
+router.get('/get-data', function(req, res, next) {
+  Patient.find()
+      .then(function(doc) {
+        res.render('index_pat', {items: doc});
+      });
 });
 
 //2. Creating a patient
@@ -23,12 +27,24 @@ router.post('/insert', function(req, res, next) {
   res.redirect('/');
 });
 
-//3. Reading a patient
-router.get('/get-data', function(req, res, next) {
-  Patient.find()
-      .then(function(doc) {
-        res.render('index_pat', {items: doc});
-      });
+router.post('/update', function (req, res, next) {
+  var id = req.body.id;
+
+  Patient.findById(id, function(err, doc) {
+    if (err) {
+      console.console.error(('error, no entry found'));
+    }
+    doc.name = req.body.name;
+    doc.surname = req.body.surname;
+    doc.save();
+  })
+  res.redirect('/');
+});
+
+router.post('/delete', function (req, res, next) {
+  var id = req.body.id;
+  Patient.findByIdAndRemove(id).exec();
+  res.redirect('/');
 });
 
 module.exports = router;
